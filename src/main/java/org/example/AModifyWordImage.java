@@ -1,5 +1,6 @@
 package org.example;
 
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.util.Units;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFPicture;
@@ -96,12 +97,11 @@ public class AModifyWordImage {
 //
 
     }
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) throws InvalidFormatException {
         try
         {
             // 读取Word文档
-            String srcFile="D:/test_word/1.1.1.11改造升级校内实训基地：5个.docx";
+            String srcFile="D:/test_word/pureWord.docx";
             String desFile="D:/test_word/modified_document.docx";
             FileInputStream fis = new FileInputStream(srcFile);
             FileOutputStream fos = new FileOutputStream(desFile);
@@ -156,8 +156,8 @@ public class AModifyWordImage {
                        // Pictures.ofBytes(bytes).sizeInCm(14.3,picture.getDepth());
 //                        // 修改图片的边框
                      // if(!picture.getCTPicture().getSpPr().isSetSolidFill())
-
-                            document.createPicture(paragraph,run,picture,
+                        String bid= document.addPictureData(picture.getPictureData().getData(),picture.getPictureData().getPictureType());
+                        document.createPicture(paragraph,run,picture,
                                     picture.getCTPicture().
                                             getBlipFill().getBlip().getEmbed(),
                                     (int)picture.getCTPicture().getNvPicPr().getCNvPr().getId(),

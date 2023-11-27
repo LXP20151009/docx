@@ -1,17 +1,11 @@
 package org.example;
 
-import com.deepoove.poi.data.Pictures;
-import org.apache.poi.common.usermodel.PictureType;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.util.Units;
-import org.apache.poi.xddf.usermodel.XDDFColor;
 import org.apache.poi.xwpf.usermodel.*;
 import org.apache.xmlbeans.XmlException;
-import org.openxmlformats.schemas.drawingml.x2006.main.*;
-import org.openxmlformats.schemas.drawingml.x2006.wordprocessingDrawing.CTInline;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTStyle;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTStyles;
-import sun.util.calendar.BaseCalendar;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -30,7 +24,8 @@ public class AModifyWordImagex {
      * @throws XmlException
      */
     public static String getStyleValue(XWPFDocument document, String styleName) throws IOException, XmlException {
-        if (styleName == null || styleName.length() == 0) {
+        if (styleName == null || styleName.length() == 0)
+        {
             return null;
         }
         CTStyles styles = document.getStyle();
