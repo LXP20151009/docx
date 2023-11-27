@@ -7,25 +7,27 @@ import org.apache.poi.xwpf.usermodel.XWPFPicture;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlToken;
-import org.openxmlformats.schemas.drawingml.x2006.main.CTGraphicalObjectData;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTNonVisualDrawingProps;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTPositiveSize2D;
 import org.openxmlformats.schemas.drawingml.x2006.wordprocessingDrawing.CTInline;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTR;
 
 import java.io.IOException;
 import java.io.InputStream;
 
-public class CustomXWPFDocument extends XWPFDocument {
-	public CustomXWPFDocument() {
+public class CustomXWPFDocument extends XWPFDocument
+{
+	public CustomXWPFDocument()
+    {
 		super();
 	}
 	
-	public CustomXWPFDocument(OPCPackage opcPackage) throws IOException {
+	public CustomXWPFDocument(OPCPackage opcPackage) throws IOException
+    {
 		super(opcPackage);
 	}
 	
-    public CustomXWPFDocument(InputStream in) throws IOException {
+    public CustomXWPFDocument(InputStream in) throws IOException
+    {
         super(in);
     }
 
