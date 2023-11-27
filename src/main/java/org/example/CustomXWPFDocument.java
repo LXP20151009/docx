@@ -50,7 +50,6 @@ public class CustomXWPFDocument extends XWPFDocument
        //CTInline inline= createParagraph().createRun().getCTR().addNewDrawing().addNewInline();
        // run.getCTR().getDrawingList().remove(picture);
         CTInline inline= run.getCTR().addNewDrawing().addNewInline();
-
         String picXml = "" +
                 "<a:graphic xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\">" +
                 "   <a:graphicData uri=\"http://schemas.openxmlformats.org/drawingml/2006/picture\">" +

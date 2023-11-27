@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-public class DocxProcessor
+public class DocxZipAndUnzip
 {
     public static void unzipDocx(String docxFilePath, String outputFolder) throws IOException
     {
@@ -93,7 +93,7 @@ public class DocxProcessor
             {
                 if (!f.isDirectory() && f.getName().indexOf("docx") > 0)
                 {
-                    DocxProcessor.unzipDocx(f.getAbsolutePath(),
+                    DocxZipAndUnzip.unzipDocx(f.getAbsolutePath(),
                             tempPath + f.getName().replaceAll("\\.docx", ""));
                 }
             }

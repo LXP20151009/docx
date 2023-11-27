@@ -7,7 +7,7 @@ import java.io.FileInputStream;
 
 public class CreateXWPFDocumentDumpDocumentXML {
     
- static String printDocumentXML(XWPFDocument docx) throws Exception {
+ static String getDocumentXml(XWPFDocument docx) throws Exception {
      
   String xml;
   
@@ -41,7 +41,7 @@ public class CreateXWPFDocumentDumpDocumentXML {
 //  run.setText("The paragraph content ...");
 //  paragraph = docx.createParagraph();
 
-     String xmlContent = printDocumentXML(docx);
+     String xmlContent = getDocumentXml(docx);
 //        xmlContent=   xmlContent.replaceAll("(a:ext\\ cx=\"\\d+)","a:ext\\ cx=\"5148000");
 //        xmlContent=      xmlContent.replaceAll("(5148000\"\\ cy=\"\\d+)","5148000\"\\ cy=\"2880000");
 
@@ -91,7 +91,7 @@ public class CreateXWPFDocumentDumpDocumentXML {
 //  run.setText("The paragraph content ...");
 //  paragraph = docx.createParagraph();
 
-        String xmlContent=  printDocumentXML(docx);
+        String xmlContent=  getDocumentXml(docx);
 //        xmlContent=   xmlContent.replaceAll("(a:ext\\ cx=\"\\d+)","a:ext\\ cx=\"5148000");
 //        xmlContent=      xmlContent.replaceAll("(5148000\"\\ cy=\"\\d+)","5148000\"\\ cy=\"2880000");
 
