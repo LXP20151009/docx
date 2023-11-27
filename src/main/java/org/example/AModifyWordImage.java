@@ -108,28 +108,33 @@ public class AModifyWordImage {
             CustomXWPFDocument document = new CustomXWPFDocument(fis);
             //HWPFDocument document =new HWPFDocument(fis);
             int para=1;
-            int  pc=1;
+            int  runCount=1;
             int  pic=1;
             List<XWPFPicture> priPics=new ArrayList<XWPFPicture>() ;
             // 获取文档中的所有段落
             for (XWPFParagraph paragraph : document.getParagraphs())
             {
-                pc=1;
+
 //                XWPFParagraph currenPara= desDoc.createParagraph();
 //                currenPara=paragraph;
                 //paragraph.setBorderTop(Borders.valueOf(3));
+                runCount=1;
                 System.out.println(para+" para.toString():    :"+paragraph.toString());
                 System.out.println(para+" para  getStyle:"+paragraph.getStyle());
-                System.out.println(para+++" para.getText   :"+paragraph.getText());
+                System.out.println(para+" para.getText   :"+paragraph.getText());
                 int pos = 0;
                 // 获取段落中的所有Run
                 for (XWPFRun run : paragraph.getRuns())
                 {
+                    System.out.println(runCount+" run.text()   :"+run.text());
+                    System.out.println("paragraph:"+para+"  run  :"+runCount+" run  有"
+                            +run.getEmbeddedPictures().size()+"张图片");
 //                    XWPFRun currenRun=currenPara.createRun();
 //                    currenRun.setText(run.text());
 //                    currenRun=run;
+                    runCount++;
                     pic=1;
-                    System.out.println(pc+" run.text()   :"+run.text());
+
                     //run.getEmbeddedPictures().removeAll(priPics);
                     // 获取Run中的所有Embedded Pictures
                     for (XWPFPicture picture : run.getEmbeddedPictures())
@@ -168,7 +173,7 @@ public class AModifyWordImage {
                                     19500,
                                     "33A5FF",picture.getCTPicture().
                                             getBlipFill().getBlip().getEmbed());
-                            pic++;
+
 
 //                            CTSRgbColor ctsRgbColor = CTSRgbColor.Factory.newInstance();
 //                            ctsRgbColor.addNewBlue();
@@ -192,6 +197,7 @@ public class AModifyWordImage {
                     }
                     //run.getEmbeddedPictures().removeAll(priPics);
                 }
+                para++;
             }
 
             // 保存修改后的Word文档
