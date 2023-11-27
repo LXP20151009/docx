@@ -47,9 +47,9 @@ public class CustomXWPFDocument extends XWPFDocument
 //        XWPFRun paraRun = para.createRun();
 //
 //        CTR ctr= paraRun.getCTR();
-       CTInline inline= createParagraph().createRun().getCTR().addNewDrawing().addNewInline();
+       //CTInline inline= createParagraph().createRun().getCTR().addNewDrawing().addNewInline();
        // run.getCTR().getDrawingList().remove(picture);
-    //    CTInline inline= run.getCTR().addNewDrawing().addNewInline();
+        CTInline inline= run.getCTR().addNewDrawing().addNewInline();
 
         String picXml = "" +
                 "<a:graphic xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\">" +
@@ -85,7 +85,8 @@ public class CustomXWPFDocument extends XWPFDocument
 
         //CTGraphicalObjectData graphicData = inline.addNewGraphic().addNewGraphicData();
         XmlToken xmlToken = null;
-        try {
+        try
+        {
             xmlToken = XmlToken.Factory.parse(picXml);
         } catch(XmlException xe) {
             xe.printStackTrace();
