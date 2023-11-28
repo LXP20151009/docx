@@ -333,7 +333,7 @@ public class AModifyWordImage {
         try
         {
             // 读取Word文档
-            String srcFile="D:/test_word/realFile2.docx";
+            String srcFile="D:/test_word/test1.docx";
             String desFile="D:/test_word/modified_document.docx";
             FileInputStream fis = new FileInputStream(srcFile);
             FileOutputStream fos = new FileOutputStream(desFile);
@@ -435,6 +435,20 @@ public class AModifyWordImage {
 
                         // 获取图片对象
                         XWPFPictureData pictureData = picture.getPictureData();
+                        paragraph.setAlignment(ParagraphAlignment.CENTER);
+                        // word标准布局的页边距
+                          long LEFT_MARGIN = 1800L;
+                          long RIGHT_MARGIN = 1800L;
+                          long TOP_MARGIN = 1440L;
+                          long BOTTOM_MARGIN = 1440L;
+
+//                        CTSectPr sectPr = document.getDocument().getBody().getSectPr();
+//                        CTPageMar pageMar = sectPr.getPgMar();
+//                        pageMar.setLeft(BigInteger.valueOf(LEFT_MARGIN));
+//                        pageMar.setRight(BigInteger.valueOf(RIGHT_MARGIN));
+//                        pageMar.setTop(BigInteger.valueOf(TOP_MARGIN));
+//                        pageMar.setBottom(BigInteger.valueOf(BOTTOM_MARGIN));
+
                         byte[] bytes = pictureData.getData();
                         double hight=  Units.pixelToPoints(picture.getDepth()) * 2.54 / 1440.0 * 20.0;
                         // Pictures.ofBytes(bytes).sizeInCm(14.3,hight).create();
