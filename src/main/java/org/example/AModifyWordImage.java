@@ -5,8 +5,8 @@ import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.util.Units;
 import org.apache.poi.xwpf.usermodel.*;
 import org.apache.xmlbeans.XmlException;
-import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlToken;
+import org.openxmlformats.schemas.drawingml.x2006.wordprocessingDrawing.CTAnchor;
 import org.openxmlformats.schemas.drawingml.x2006.wordprocessingDrawing.CTInline;
 
 import java.io.FileInputStream;
@@ -17,7 +17,8 @@ import java.util.List;
 
 public class AModifyWordImage {
 
-    public static void PoiSetWidth(XWPFPicture picture ,int pic,float width ) throws XmlException {
+    public static void PoiSetWidth(XWPFPicture picture ,int pic,long width ) throws XmlException
+    {
         System.out.println("pic" + pic + "  picture.getCTPicture()  :" + picture.getCTPicture());
         System.out.println("pic" + pic + "  picture.getDepth()  :" + picture.getDepth());
         System.out.println("pic" + pic + "  picture.getWidth()  :" + picture.getWidth());
@@ -70,9 +71,12 @@ public class AModifyWordImage {
             if ((null == picture.getCTPicture().getSpPr().getLn()))
             {
                 picture.getCTPicture().getSpPr().addNewLn().setW(9500);
-            } else {
+            }
+            else
+                {
                 picture.getCTPicture().getSpPr().getLn().setW(9500);
             }
+
         if ((null != picture.getCTPicture().getSpPr().getLn().getSolidFill()))
         {
             //picture.getCTPicture().getSpPr().getLn().
@@ -87,13 +91,15 @@ public class AModifyWordImage {
                     //"                      </a:solidFill>\n" +
                     //"                    </a:ln>\n"
                     ;
-          String xml=  picture.getCTPicture().getSpPr().getLn().getSolidFill().xmlText();
+          //String xml=  picture.getCTPicture().getSpPr().getLn().getSolidFill().xmlText();
+
             picture.getCTPicture().getSpPr().getLn().getSolidFill()
                     .set(XmlToken.Factory.parse(solidFillStr));
 
 
         }
-            if ((null == picture.getCTPicture().getSpPr().getLn().getSolidFill())) {
+            if ((null == picture.getCTPicture().getSpPr().getLn().getSolidFill()))
+            {
                 //picture.getCTPicture().getSpPr().getLn().
                 picture.getCTPicture().getSpPr().getLn().addNewSolidFill();
 
@@ -107,14 +113,12 @@ public class AModifyWordImage {
             }
             picture.getCTPicture().getSpPr().getLn().getSolidFill().getSrgbClr().
                     setVal(new byte[]{(byte) (51), (byte) (165), (byte) (255)});
-            // setVal(new byte[]{(byte) (51^ 0xff),(byte)(165^ 0xff),(byte)(255^ 0xff)});
-
-        //picture.getCTPicture().getSpPr().getLn().getSolidFill().set();
-
-            picture.getCTPicture().getSpPr().getXfrm().getExt().setCx((long)( width * 360000));  // 设置宽度
+            picture.getCTPicture().getSpPr().getXfrm().getExt().setCx(width);  // 设置宽度
 //            picture.getCTPicture().getSpPr().getXfrm().getExt().setCy((long) 8 * 360000);  // 设置宽度
-//                            System.out.println("是否等于："+  (picture.getCTPicture().getSpPr().getSolidFill()==
-//
+          if(picture.getCTPicture().getSpPr().getLn().isSetNoFill())
+          {
+              picture.getCTPicture().getSpPr().getLn().unsetNoFill();
+          }
 
     }
     public static void preMain(String[] args) throws InvalidFormatException
@@ -162,7 +166,7 @@ public class AModifyWordImage {
                     for (XWPFPicture picture : run.getEmbeddedPictures())
                     {
                         priPics.add(picture);
-                        PoiSetWidth(picture,pic,14.3f);
+                        PoiSetWidth(picture,pic,(long)(14.3*360000));
                         CTInline inline= run.getCTR().getDrawingList().get(pic).getInlineArray(pic);
                         inline.getExtent().setCx((long)(14.3*360000));
                         //插入图片
@@ -276,8 +280,56 @@ public class AModifyWordImage {
             throw new RuntimeException(e);
         }
     }
-    public static void main(String[] args) throws InvalidFormatException
+    public static void setAnchorAndInline(XWPFRun run,XWPFPicture picture,long width)
     {
+           //org.openxmlformats.schemas.wordprocessingml.x2006.main.CTDrawing
+        List<org.openxmlformats.schemas.wordprocessingml.x2006.main.CTDrawing> drawingList
+                =  run.getCTR().getDrawingList();
+        for(org.openxmlformats.schemas.wordprocessingml.x2006.main.CTDrawing drawing:drawingList)
+        {
+            for(CTAnchor ctAnchor :drawing.getAnchorList())
+            {
+                if((ctAnchor.getGraphic().getGraphicData()).toString().
+                        indexOf("blip r:embed=\""+picture.getCTPicture().getBlipFill().getBlip().getEmbed()+"\"")>-1)
+                {
+                    System.out.println("图片 ："+picture.getCTPicture().getBlipFill().getBlip().getEmbed()
+                            +"的 CTAnchor被设置cx");
+                    ctAnchor.getExtent().setCx(width);
+                    System.out.println("CTAnchor被设置cx 后为 ："+drawing.toString());
+                    //ctAnchor.getGraphic().toString();
+                }
+//                if(((ctAnchor.getGraphic()) instanceof XWPFPicture)&&(ctAnchor.getGraphic().equals(picture)))
+//                {
+//                    ctAnchor.getExtent().setCx(width);
+//                }
+            }
+
+        }
+        for(org.openxmlformats.schemas.wordprocessingml.x2006.main.CTDrawing drawing:drawingList)
+        {
+            // org.openxmlformats.schemas.drawingml.x2006.wordprocessingDrawing.CTAnchor
+
+            for(CTInline ctInline :drawing.getInlineList())
+            {
+                if((ctInline.getGraphic().getGraphicData()).toString().indexOf
+                        ("blip r:embed=\""+picture.getCTPicture().getBlipFill().getBlip().getEmbed()+"\"")>-1)
+                {
+
+                    System.out.println("图片 ："+picture.getCTPicture().getBlipFill().getBlip().getEmbed()
+                            +"的 CTInLine被设置cx");
+                    ctInline.getExtent().setCx(width);
+                    System.out.println("CTInLine被设置cx 后为 ："+drawing.toString());
+                           // ctInline.getGraphic().toString());
+                }
+
+//                if((ctInline.getGraphic().getGraphicData() instanceof XWPFPicture)&&(ctInline.getGraphic().equals(picture)))
+//                {
+//                    ctInline.getExtent().setCx(width);
+//                }
+            }
+        }
+    }
+    public static void main(String[] args) throws InvalidFormatException, XmlException {
         try
         {
             // 读取Word文档
@@ -311,10 +363,20 @@ public class AModifyWordImage {
                 System.out.println(para+" para.getText   :"+paragraph.getText());
                 int pos = 0;
                 int pictureAmount=0;
+                int amountOneLine=0;
+                long sumWidth=0l;
+                List<Long> picWidthArray=new ArrayList<Long>();
                 // 获取段落中的所有Run
                 for (XWPFRun run : paragraph.getRuns())
                 {
                     pictureAmount += run.getEmbeddedPictures().size();
+                    for (int i=0;i<run.getEmbeddedPictures().size();i++)
+                    {
+                        XWPFPicture picture = run.getEmbeddedPictures().get(i);
+                        picWidthArray.add(picture.getCTPicture().getSpPr().getXfrm().getExt().getCx());
+                        sumWidth+=picture.getCTPicture().getSpPr().getXfrm().getExt().getCx();
+                    }
+
                 }
 
 
@@ -333,11 +395,32 @@ public class AModifyWordImage {
                     // 获取Run中的所有Embedded Pictures
                     for (XWPFPicture picture : run.getEmbeddedPictures())
                     {
-                        float desiredWidthCm = 14.3f;
-                        priPics.add(picture);
-                        PoiSetWidth(picture,pic,(float)(desiredWidthCm/pictureAmount));
-                        CTInline inline= run.getCTR().getDrawingList().get(pic-1).getInlineArray(pic-1);
-                        inline.getExtent().setCx((long)(desiredWidthCm/pictureAmount*360000));
+                        float desiredWidthCm = 14.3f;//厘米
+                        //priPics.add(picture);
+                        //if( picture.getCTPicture().getSpPr().getXfrm().getExt().getCx()/360000)
+                        PoiSetWidth(picture,pic,(long)(desiredWidthCm*360000/pictureAmount));
+                        System.out.println("changed pic"+pic+"  picture.getCTPicture()  :"+picture.getCTPicture());
+                        setAnchorAndInline(run,picture,(long)(desiredWidthCm*360000/pictureAmount));
+//                        if(0!=run.getCTR().getDrawingList().get(pic-1).getAnchorList().size())
+//                        {
+//
+//                            run.getCTR().getDrawingList();
+////                            run.getCTR().getDrawingList().get(pic-1).getAnchorArray(0).getExtent().
+////                                    setCx((long)(desiredWidthCm/pictureAmount*360000));
+//                          picture.getPictureData().getParent();
+//                          CTAnchor ctAnchor=(CTAnchor) picture.getPictureData().getParent();
+//                          ctAnchor.getExtent().setCx((long)(desiredWidthCm/pictureAmount*360000));
+//                        }
+//                        if(0!=run.getCTR().getDrawingList().get(pic-1).getInlineList().size())
+//                        {
+//                            picture.getPictureData().getParent();
+//                            CTInline inline=(CTInline) picture.getPictureData().getParent();
+//                            //CTInline inline= run.getCTR().getDrawingList().get(pic-1).getInlineArray(0);
+//                            inline.getExtent().setCx((long)(desiredWidthCm/pictureAmount*360000));
+//
+//
+//                        }
+
                         //插入图片
 //                        InputStream inputStream = new ByteArrayInputStream(decoderBytes);
 //
@@ -386,11 +469,11 @@ public class AModifyWordImage {
 //                            // 设置边框颜色
 ////                       // picture.getCTPicture().getSpPr().addNewLn().setAlgn(STPenAlignment.Enum.forInt(1));  // 设置边框居中
 
-                        System.out.println("changed pic"+pic+"  picture.getCTPicture()  :"+picture.getCTPicture());
-                        System.out.println("changed pic"+pic+"  picture.getDepth()  :"+picture.getDepth());
-                        System.out.println("changed pic"+pic+"  picture.getWidth()  :"+picture.getWidth());
-                        System.out.println("changed pic"+pic+"  picture.getPictureData()  :"+picture.getPictureData());
-                        System.out.println("changed pic"+pic+++"  picture.getDescription()  :"+picture.getDescription());
+//                        System.out.println("changed pic"+pic+"  picture.getCTPicture()  :"+picture.getCTPicture());
+//                        System.out.println("changed pic"+pic+"  picture.getDepth()  :"+picture.getDepth());
+//                        System.out.println("changed pic"+pic+"  picture.getWidth()  :"+picture.getWidth());
+//                        System.out.println("changed pic"+pic+"  picture.getPictureData()  :"+picture.getPictureData());
+//                        System.out.println("changed pic"+pic+++"  picture.getDescription()  :"+picture.getDescription());
                     }
                     //run.getEmbeddedPictures().removeAll(priPics);
                 }
