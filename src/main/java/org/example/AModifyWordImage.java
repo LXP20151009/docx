@@ -97,12 +97,18 @@ public class AModifyWordImage {
                     ctInline.getCNvGraphicFramePr().set(ctAnchor.getCNvGraphicFramePr());
                     ctInline.getGraphic().set(ctAnchor.getGraphic());
                     drawing.getInlineList().add(ctInline);
+                    CTInline []ctInline1=new CTInline[drawing.getInlineArray().length+1];
+                    for(int i=1;i<ctInline1.length;i++)
+                    {
+                        ctInline1[i]=drawing.getInlineArray()[i-1];
+                    }
+                    ctInline1[0]=ctInline;
                     ctAnchor.getExtent().setCx(0);
                     ctAnchor.getExtent().setCy(0);
-                    //drawing.getAnchorList().remove(ctAnchor);
+                    drawing.getAnchorList().remove(ctAnchor);
                    // drawing.set(fakeDrawing);
                     System.out.println("替换好的 drawing为：  "+drawing.toString());
-                    break;
+                    return;
 //                    XmlCursor cursor = ctAnchor.newCursor();
 
 //                    cursor.selectPath("./*");
@@ -372,6 +378,7 @@ public class AModifyWordImage {
                     ctAnchor.getEffectExtent().setL("10000");
                     ctAnchor.getEffectExtent().setR("10000");
                     setAnchorToInline(run,picture,width,EMUHeight);
+                    break;
                     //ctAnchor.getGraphic().toString();
                 }
 //                if(((ctAnchor.getGraphic()) instanceof XWPFPicture)&&(ctAnchor.getGraphic().equals(picture)))
