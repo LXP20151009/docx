@@ -96,7 +96,11 @@ public class AModifyWordImage {
                     ctInline.getDocPr().set(ctAnchor.getDocPr());
                     ctInline.getCNvGraphicFramePr().set(ctAnchor.getCNvGraphicFramePr());
                     ctInline.getGraphic().set(ctAnchor.getGraphic());
-                    drawing.set(fakeDrawing);
+                    drawing.getInlineList().add(ctInline);
+                    ctAnchor.getExtent().setCx(0);
+                    ctAnchor.getExtent().setCy(0);
+                    //drawing.getAnchorList().remove(ctAnchor);
+                   // drawing.set(fakeDrawing);
                     System.out.println("替换好的 drawing为：  "+drawing.toString());
                     break;
 //                    XmlCursor cursor = ctAnchor.newCursor();
