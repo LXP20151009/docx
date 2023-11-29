@@ -103,6 +103,8 @@ public class AModifyWordImage {
                         ctInline1[i]=drawing.getInlineArray()[i-1];
                     }
                     ctInline1[0]=ctInline;
+                    drawing.setInlineArray(ctInline1);
+
                     ctAnchor.getExtent().setCx(0);
                     ctAnchor.getExtent().setCy(0);
                     drawing.getAnchorList().remove(ctAnchor);
