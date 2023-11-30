@@ -107,7 +107,7 @@ public class AModifyWordImage {
 
                     ctAnchor.getExtent().setCx(0);
                     ctAnchor.getExtent().setCy(0);
-                    drawing.getAnchorList().remove(ctAnchor);
+                   // drawing.getAnchorList().remove(ctAnchor);
                    // drawing.set(fakeDrawing);
                     System.out.println("替换好的 drawing为：  "+drawing.toString());
                     return;
