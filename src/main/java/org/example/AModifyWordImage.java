@@ -30,6 +30,8 @@ public class AModifyWordImage {
         {
             for(CTAnchor ctAnchor :drawing.getAnchorList())
             {
+
+                
                 if((ctAnchor.getGraphic().getGraphicData()).toString().
                         indexOf("blip r:embed=\""+picture.getCTPicture().getBlipFill().getBlip().getEmbed()+"\"")>-1)
                 {
@@ -429,6 +431,7 @@ public class AModifyWordImage {
             XWPFTemplate  xwpfTemplate= XWPFTemplate.compile(srcFile);
             //List<XWPFPicture> pictureList=
             XWPFDocument document=        xwpfTemplate.getXWPFDocument();
+            //xwpfTemplate.render();
 //            for(int i=0;i< pictureList.size();i++)
 //            {
 //                pictureList.get(i)
@@ -440,8 +443,6 @@ public class AModifyWordImage {
             // 获取文档中的所有段落
             for (XWPFParagraph paragraph : document.getParagraphs())
             {
-
-
 
                 runCount=1;
                 System.out.println(para+" para.toString():    :"+paragraph.toString());
@@ -463,7 +464,7 @@ public class AModifyWordImage {
                         XWPFPicture picture = run.getEmbeddedPictures().get(i);
                         picWidthArray.add(picture.getCTPicture().getSpPr().getXfrm().getExt().getCx());
                         sumWidth+=picture.getCTPicture().getSpPr().getXfrm().getExt().getCx();
-                        if(sumWidth>14.3*360000)
+                        if(sumWidth>16*360000&& priPics.size()>1)
                         {
                             priPics.remove(picture);
                             pictureGroups.add(priPics);
@@ -567,13 +568,6 @@ public class AModifyWordImage {
                         long RIGHT_MARGIN = 1800L;
                         long TOP_MARGIN = 1440L;
                         long BOTTOM_MARGIN = 1440L;
-
-//                        CTSectPr sectPr = document.getDocument().getBody().getSectPr();
-//                        CTPageMar pageMar = sectPr.getPgMar();
-//                        pageMar.setLeft(BigInteger.valueOf(LEFT_MARGIN));
-//                        pageMar.setRight(BigInteger.valueOf(RIGHT_MARGIN));
-//                        pageMar.setTop(BigInteger.valueOf(TOP_MARGIN));
-//                        pageMar.setBottom(BigInteger.valueOf(BOTTOM_MARGIN));
                         double hight=  Units.pixelToPoints(picture.getDepth()) * 2.54 / 1440.0 * 20.0;
                         // Pictures.ofBytes(bytes).sizeInCm(14.3,hight).create();
                         // Pictures.ofBytes(bytes).sizeInCm(14.3,picture.getDepth());
