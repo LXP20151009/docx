@@ -1,30 +1,31 @@
-package org.example;
-
 import java.io.*;
 import java.util.zip.*;
 
 public class ZipUnzipDocx {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         String inputFilePath = "D:/test_word/new.docx";
         String outputFolderPath = "D:/test_word/output-folder";
-
+        String zipFilePath="D:/test_word/zipFiles/";
         // Step 1: Unzip the DOCX file
-        unzipDocx(inputFilePath, outputFolderPath);
+        File srcFile=new File(inputFilePath);
+        unzipDocx(inputFilePath,
+                outputFolderPath+File.separator+srcFile.getName());
 
         // Step 2: Modify the contents (e.g., styles.xml) in the output folder as needed
 
         // Step 3: Zip the modified contents back into a DOCX file
-        zipDocx(outputFolderPath, "D:/test_word/reset/");
+        zipDocx(outputFolderPath,
+                zipFilePath+File.separator+srcFile.getName());
     }
 
     private static void unzipDocx(String inputFilePath, String outputFolderPath) {
         try (ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(inputFilePath))) {
             byte[] buffer = new byte[1024];
             ZipEntry zipEntry;
-            File srcFile= new File(inputFilePath);
+
             // Create output directory if not exists
-            File outputFolder = new File(outputFolderPath+File.separator+srcFile.getName());
+            File outputFolder = new File(outputFolderPath);
             if (!outputFolder.exists()) {
                 outputFolder.mkdirs();
             }
@@ -54,7 +55,11 @@ public class ZipUnzipDocx {
         }
     }
 
-    private static void zipDocx(String inputFolderPath, String outputFilePath) {
+    private static void zipDocx(String inputFolderPath, String outputFilePath) throws IOException {
+
+        File outFile= new File(outputFilePath);
+        outFile.getParentFile().mkdir();
+        outFile.createNewFile();
         try (FileOutputStream fileOutputStream = new FileOutputStream(outputFilePath);
              ZipOutputStream zipOutputStream = new ZipOutputStream(fileOutputStream)) {
 
