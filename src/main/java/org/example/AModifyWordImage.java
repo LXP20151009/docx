@@ -464,7 +464,7 @@ public class AModifyWordImage {
                         XWPFPicture picture = run.getEmbeddedPictures().get(i);
                         picWidthArray.add(picture.getCTPicture().getSpPr().getXfrm().getExt().getCx());
                         sumWidth+=picture.getCTPicture().getSpPr().getXfrm().getExt().getCx();
-                        if(sumWidth>16*360000&& priPics.size()>1)
+                        if((sumWidth>16*360000)&& (priPics.size()>1))
                         {
                             priPics.remove(picture);
                             pictureGroups.add(priPics);

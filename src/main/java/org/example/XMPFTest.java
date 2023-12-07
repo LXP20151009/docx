@@ -21,8 +21,8 @@ public class XMPFTest {
         //List<XWPFPicture> pictureList=
         XWPFDocument document=        xwpfTemplate.getXWPFDocument();
         String text = "this a paragraph";
-        Texts.of().style()
-        Documents.of().addParagraph(Paragraphs.of().addPicture(Pictures.of().sizeInCm(14.3,8).center().altMeta().create()));
+        //Texts.of().style()
+       // Documents.of().addParagraph(Paragraphs.of().addPicture(Pictures.of().sizeInCm(14.3,8).center().altMeta().create()));
         DocumentRenderData data = Documents.of().addParagraph(Paragraphs.of(text).create()).create();
         XWPFTemplate template = XWPFTemplate.create(data);
 
