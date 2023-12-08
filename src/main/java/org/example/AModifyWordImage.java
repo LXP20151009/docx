@@ -19,6 +19,50 @@ import java.util.List;
 
 public class AModifyWordImage {
 
+    public static String getTitleLvl(XWPFDocument doc, XWPFParagraph para)
+    {
+        String titleLvl = "";
+        try
+        {
+            //判断该段落是否设置了大纲级别
+            if (para.getCTP().getPPr().getOutlineLvl() != null) {
+                return String.valueOf(para.getCTP().getPPr().getOutlineLvl().getVal());
+            }
+        }
+        catch (Exception e)
+        {
+        }
+        try {
+            //判断该段落的样式是否设置了大纲级别
+            if (doc.getStyles().getStyle(para.getStyle()).getCTStyle().getPPr().getOutlineLvl() != null) {
+                return String.valueOf(doc.getStyles().getStyle(para.getStyle()).getCTStyle().getPPr().getOutlineLvl().getVal());
+            }
+        } catch (Exception e)
+        {
+        }
+        try {
+            //判断该段落的样式的基础样式是否设置了大纲级别
+            if (doc.getStyles().getStyle(doc.getStyles().getStyle(para.getStyle()).getCTStyle().getBasedOn().getVal())
+                    .getCTStyle().getPPr().getOutlineLvl() != null) {
+                String styleName = doc.getStyles().getStyle(para.getStyle()).getCTStyle().getBasedOn().getVal();
+                return String.valueOf(doc.getStyles().getStyle(styleName).getCTStyle().getPPr().getOutlineLvl().getVal());
+            }
+        } catch (Exception e) {
+
+        }
+        try {
+            if (para.getStyleID() != null)
+            {
+                return para.getStyleID();
+            }
+        } catch (Exception e) {
+
+        }
+
+        return titleLvl;
+    }
+
+
     public static void setAnchorToInline(XWPFRun run,XWPFPicture picture,long width,long EMUHeight) throws XmlException {
         List<org.openxmlformats.schemas.wordprocessingml.x2006.main.CTDrawing> drawingList
                 =  run.getCTR().getDrawingList();
@@ -420,6 +464,8 @@ public class AModifyWordImage {
             //String desFile="D:\\test_word\\modifyFile.docx";
             String srcFileFolder = "D:\\modify_source\\";
             String desFile = "D:\\modify_source_target\\";
+            String styleModelFile="D:\\modify_source\\styles_model.docx";
+
             File desFileFolder =new File(desFile);
             desFileFolder.mkdir();
             File srcFileDir = new File(srcFileFolder);
@@ -429,6 +475,7 @@ public class AModifyWordImage {
        for (File srcFile : files)
             {
 
+                XWPFTemplate styleModel = XWPFTemplate.compile(styleModelFile);
          try {
                 FileInputStream fis = new FileInputStream(srcFile);
                FileOutputStream fos = new FileOutputStream(desFile+srcFile.getName());
@@ -437,6 +484,20 @@ public class AModifyWordImage {
             XWPFTemplate xwpfTemplate = XWPFTemplate.compile(srcFile);
             //List<XWPFPicture> pictureList=
             XWPFDocument document = xwpfTemplate.getXWPFDocument();
+//             for (XWPFStyle style: styleModel.getXWPFDocument().getStyles().getUsedStyleList
+//                     (styleModel.getXWPFDocument().getStyles().getStyleWithName("Normal")))
+//             {
+//                 document.getStyles().addStyle(style);
+//             }
+             for(int styleId=1;;styleId++)
+             {
+                 XWPFStyle style=styleModel.getXWPFDocument().getStyles().getStyle(String.valueOf(styleId));
+                 if(null==style) break;
+                 document.getStyle();
+                 //document.getStyles().addStyle(style);
+
+             }
+
             //xwpfTemplate.render();
 //            for(int i=0;i< pictureList.size();i++)
 //            {
@@ -447,8 +508,11 @@ public class AModifyWordImage {
             int pic = 1;
             List<XWPFPicture> priPics = new ArrayList<XWPFPicture>();
             // 获取文档中的所有段落
-            for (XWPFParagraph paragraph : document.getParagraphs()) {
-
+            for (XWPFParagraph paragraph : document.getParagraphs())
+            {
+                String text= paragraph.getText();
+               String tempLevel= getTitleLvl(document,paragraph);
+                XWPFStyle style=document.getStyles().getStyle( paragraph.getStyleID());
                 runCount = 1;
                 System.out.println(para + " para.toString():    :" + paragraph.toString());
                 System.out.println(para + " para  getStyle:" + paragraph.getStyle());
@@ -509,22 +573,7 @@ public class AModifyWordImage {
                         //priPics.add(picture);
                         //if( picture.getCTPicture().getSpPr().getXfrm().getExt().getCx()/360000)
 
-//                        CTP ctp = paragraph.getCTP();
-//                        CTPPr ppr = ctp.isSetPPr() ? ctp.getPPr() : ctp.addNewPPr();
-//                        CTSpacing spacing = ppr.isSetSpacing()? ppr.getSpacing() : ppr.addNewSpacing();
-//                        spacing.setAfter(BigInteger.valueOf(10));
-//                        spacing.setBefore(BigInteger.valueOf(10));
-//                        //注意设置行距类型为 EXACT
-//                        spacing.setLineRule(STLineSpacingRule.AUTO);
-//                        //1磅数是20
-//                        spacing.setLine(BigInteger.valueOf(300));
-//                        paragraph.setSpacingBefore(10);
-////                        paragraph.setSpacingBeforeLines(50);
-//                        paragraph.setSpacingAfter(10);
-//                        System.out.println(" paragraph.getSpacingBetween(): "+ paragraph.getSpacingBetween());
-//                        paragraph.getSpacingBetween();
-////                        paragraph.setSpacingAfterLines(50);
-//                        paragraph.setSpacingBetween(300);
+
                         for (List<XWPFPicture> list : pictureGroups) {
                             if (list.indexOf(picture) > -1) {
                                 pictureAmount = list.size();
@@ -545,17 +594,6 @@ public class AModifyWordImage {
                         System.out.println("changed pic" + pic + "  picture.getCTPicture()  :" + picture.getCTPicture());
                         setAnchorAndInline(run, picture, (long) (desiredWidthCm * 360000 / pictureAmount), desiredHeight);
 
-                        //插入图片
-//                        InputStream inputStream = new ByteArrayInputStream(decoderBytes);
-//
-//                        //为图片设置黑色边框
-//                        XWPFPicture xwpfPicture = run.addPicture(inputStream, picture.getPictureData().getPictureType(), picture.getPictureData().getFileName(), Units.toEMU(picture.getWidth()), Units.toEMU(picture.getDepth()));
-//                        xwpfPicture.getCTPicture().getSpPr().addNewLn().addNewSolidFill().addNewSchemeClr().setVal(STSchemeColorVal.Enum.forString("tx1"));
-//                        inputStream.close();
-//                        InputStream inputStream = new ByteArrayInputStream(decoderBytes);
-//                        //为图片设置黑色边框
-//                        XWPFPicture xwpfPicture = run.addPicture(inputStream, getPictureType(head), picture.getFileName(), Units.toEMU(picture.getWidth()), Units.toEMU(picture.getHeight()));
-//                        xwpfPicture.getCTPicture().getSpPr().addNewLn().addNewSolidFill().addNewSchemeClr().setVal(STSchemeColorVal.Enum.forString("tx1"));
 
                         // 获取图片对象
 
@@ -623,8 +661,11 @@ public class AModifyWordImage {
             }
             // 保存修改后的Word文档
             // FileOutputStream fos = new FileOutputStream("D:/test_word/modified_document.docx");
-            //document.write(fos);
+             //styleModel.getXWPFDocument().getDocument().set(xwpfTemplate.getXWPFDocument().getDocument());
+           // styleModel.writeAndClose(fos);
             xwpfTemplate.writeAndClose(fos);
+
+             //styleModel.writeAndClose(fos);
             fos.flush();
             // 关闭资源
             fis.close();
