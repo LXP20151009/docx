@@ -629,47 +629,12 @@ public class AModifyWordImage {
             // 关闭资源
             fis.close();
             fos.close();
-//删除图片
-//            FileOutputStream delFos = new FileOutputStream("D:/test_word/complete.docx");
-//            FileInputStream delFis = new FileInputStream(desFile);
-//            CustomXWPFDocument desDoc= new CustomXWPFDocument(delFis);
-//            System.out.println("一共："+desDoc.getParagraphs().size()+"个 paragraph");
-//            int paraIndex=1;
-//            for (XWPFParagraph par : desDoc.getParagraphs())
-//            {
-//                int pos = 0;
-//                System.out.println("para"+paraIndex+++"一共："+par.getRuns().size()+"个 run");
-//                while (pos < par.getRuns().size())
-//                {
-//                    XWPFRun run = par.getRuns().get(pos);
-//                    double sumWidth=0f;
-//                    System.out.println("run"+pos+"一共："+run.getEmbeddedPictures().size()+"个 embeded picture");
-//                    for(XWPFPicture picture:run.getEmbeddedPictures())
-//                    {
-//                        sumWidth=(picture.getWidth()*12700);
-//                        System.out.println(sumWidth);
-//                        if (sumWidth!=(14.3*360000))
-//                        {
-//                            par.removeRun(pos);
-//                            break;
-//                        }
-//                        else
-//                        {
-//                            pos++;
-//                        }
-//                    }
-//
-//                }
-//            }
-//            desDoc.write(delFos);
-//            delFos.flush();
-//            // 关闭资源
-//            delFis.close();
-//            delFos.close();
-        } catch (IOException | XmlException e)
-            {
-            e.printStackTrace();
-        }
-    }
-    }
+
+             }
+             catch (IOException | XmlException e)
+             {
+                e.printStackTrace();
+             }
+          }
+       }
 }
