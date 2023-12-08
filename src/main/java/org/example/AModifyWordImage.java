@@ -17,7 +17,9 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class AModifyWordImage {
 
@@ -472,6 +474,7 @@ public class AModifyWordImage {
                 //添加模板中的样式
                 CTStyles ctStyles = styleModel.getXWPFDocument().getStyle();
                 CTStyle[] ctArray = ctStyles.getStyleArray();
+                Map<String,String> styleMap =new HashMap<>();
                 for (int styleId = 0; styleId < ctArray.length; styleId++)
                 {
 
@@ -482,8 +485,19 @@ public class AModifyWordImage {
 
                     document.getStyle().set(styleModel.getXWPFDocument().getStyle());
                     document.getStyles().addStyle(style);
-                    //String le= ctArray[styleId].getPPr().getOutlineLvl().toString();
-                    //System.out.println(le);
+                    try
+                    {
+                        String le= ctArray[styleId].getPPr().getOutlineLvl().toString();
+                        System.out.println(le);
+                        if(styleMap.get(le)==null)
+                        {
+                            styleMap.put(le,ctArray[styleId].getStyleId()+",,"+ctArray[styleId].getName());
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        styleMap.put("text",ctArray[styleId].getStyleId()+",,"+ctArray[styleId].getName());
+                    }
                 }
 
                 //xwpfTemplate.render();
