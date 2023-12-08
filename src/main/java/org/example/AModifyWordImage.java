@@ -4,22 +4,18 @@ import com.deepoove.poi.XWPFTemplate;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.util.Units;
 import org.apache.poi.xwpf.usermodel.*;
-import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlException;
-import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlToken;
-import org.openxmlformats.schemas.drawingml.x2006.picture.CTPicture;
 import org.openxmlformats.schemas.drawingml.x2006.wordprocessingDrawing.CTAnchor;
 import org.openxmlformats.schemas.drawingml.x2006.wordprocessingDrawing.CTInline;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTDrawing;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class AModifyWordImage {
 
@@ -98,7 +94,7 @@ public class AModifyWordImage {
                     ctInline.getDocPr().set(ctAnchor.getDocPr());
                     ctInline.getCNvGraphicFramePr().set(ctAnchor.getCNvGraphicFramePr());
                     ctInline.getGraphic().set(ctAnchor.getGraphic());
-                    drawing.getInlineList().add(ctInline);
+                    //drawing.getInlineList().add(ctInline);
                     CTInline []ctInline1=new CTInline[drawing.getInlineArray().length+1];
                     for(int i=1;i<ctInline1.length;i++)
                     {
@@ -107,8 +103,8 @@ public class AModifyWordImage {
                     ctInline1[0]=ctInline;
                     drawing.setInlineArray(ctInline1);
 
-                    ctAnchor.getExtent().setCx(0);
-                    ctAnchor.getExtent().setCy(0);
+                   // ctAnchor.getExtent().setCx(0);
+                   // ctAnchor.getExtent().setCy(0);
                    // drawing.getAnchorList().remove(ctAnchor);
                    // drawing.set(fakeDrawing);
                     System.out.println("替换好的 drawing为：  "+drawing.toString());
@@ -415,68 +411,74 @@ public class AModifyWordImage {
             }
         }
     }
-    public static void main(String[] args) throws InvalidFormatException, XmlException
-    {
-        try
-        {
+    public static void main(String[] args) throws InvalidFormatException, XmlException, IOException {
+
             // 读取Word文档
 //            String srcFile="F:\\2023双高建设\\终期个人负责\\过程性\\1.2.2.4省级研究课题：117项（20231128修改版本）.docx";
 //            String desFile="F:\\2023双高建设\\终期个人负责\\过程性\\后\\1.2.2.4省级研究课题：117项（20231128修改版本）.docx";
-            String srcFile="D:\\test_word\\new.docx";
-            String desFile="D:\\test_word\\modifyFile.docx";
-            FileInputStream fis = new FileInputStream(srcFile);
-            FileOutputStream fos = new FileOutputStream(desFile);
+            // String srcFile="D:\\test_word\\new.docx";
+            //String desFile="D:\\test_word\\modifyFile.docx";
+            String srcFileFolder = "D:\\modify_source\\";
+            String desFile = "D:\\modify_source_target\\";
+            File desFileFolder =new File(desFile);
+            desFileFolder.mkdir();
+            File srcFileDir = new File(srcFileFolder);
+            if(!srcFileDir.exists())
+            srcFileDir.mkdir();
+            File files[] = srcFileDir.listFiles();
+       for (File srcFile : files)
+            {
+
+         try {
+                FileInputStream fis = new FileInputStream(srcFile);
+               FileOutputStream fos = new FileOutputStream(desFile+srcFile.getName());
             // CustomXWPFDocument document = new CustomXWPFDocument(fis);
             //HWPFDocument document =new HWPFDocument(fis);
-            XWPFTemplate  xwpfTemplate= XWPFTemplate.compile(srcFile);
+            XWPFTemplate xwpfTemplate = XWPFTemplate.compile(srcFile);
             //List<XWPFPicture> pictureList=
-            XWPFDocument document=        xwpfTemplate.getXWPFDocument();
+            XWPFDocument document = xwpfTemplate.getXWPFDocument();
             //xwpfTemplate.render();
 //            for(int i=0;i< pictureList.size();i++)
 //            {
 //                pictureList.get(i)
 //            }
-            int para=1;
-            int  runCount=1;
-            int  pic=1;
-            List<XWPFPicture> priPics=new ArrayList<XWPFPicture>() ;
+            int para = 1;
+            int runCount = 1;
+            int pic = 1;
+            List<XWPFPicture> priPics = new ArrayList<XWPFPicture>();
             // 获取文档中的所有段落
-            for (XWPFParagraph paragraph : document.getParagraphs())
-            {
+            for (XWPFParagraph paragraph : document.getParagraphs()) {
 
-                runCount=1;
-                System.out.println(para+" para.toString():    :"+paragraph.toString());
-                System.out.println(para+" para  getStyle:"+paragraph.getStyle());
-                System.out.println(para+" para.getText   :"+paragraph.getText());
+                runCount = 1;
+                System.out.println(para + " para.toString():    :" + paragraph.toString());
+                System.out.println(para + " para  getStyle:" + paragraph.getStyle());
+                System.out.println(para + " para.getText   :" + paragraph.getText());
                 int pos = 0;
-                int pictureAmount=0;
-                int amountOneLine=0;
-                long sumWidth=0l;
-                List<Long> picWidthArray=new ArrayList<Long>();
-                List<List<XWPFPicture>> pictureGroups =new ArrayList();
+                int pictureAmount = 0;
+                int amountOneLine = 0;
+                long sumWidth = 0l;
+                List<Long> picWidthArray = new ArrayList<Long>();
+                List<List<XWPFPicture>> pictureGroups = new ArrayList();
                 // 获取段落中的所有Run
-                for (XWPFRun run : paragraph.getRuns())
-                {
+                for (XWPFRun run : paragraph.getRuns()) {
                     pictureAmount += run.getEmbeddedPictures().size();
-                    for (int i=0;i<run.getEmbeddedPictures().size();i++)
-                    {
+                    for (int i = 0; i < run.getEmbeddedPictures().size(); i++) {
                         priPics.add(run.getEmbeddedPictures().get(i));
                         XWPFPicture picture = run.getEmbeddedPictures().get(i);
                         picWidthArray.add(picture.getCTPicture().getSpPr().getXfrm().getExt().getCx());
-                        sumWidth+=picture.getCTPicture().getSpPr().getXfrm().getExt().getCx();
-                        if((sumWidth>16*360000)&& (priPics.size()>1))
-                        {
+                        sumWidth += picture.getCTPicture().getSpPr().getXfrm().getExt().getCx();
+                        if ((sumWidth > 16 * 360000) && (priPics.size() > 1)) {
                             priPics.remove(picture);
                             pictureGroups.add(priPics);
-                            priPics=new ArrayList<XWPFPicture>();
+                            priPics = new ArrayList<XWPFPicture>();
                             priPics.add(picture);
-                            sumWidth=picture.getCTPicture().getSpPr().getXfrm().getExt().getCx();
+                            sumWidth = picture.getCTPicture().getSpPr().getXfrm().getExt().getCx();
                         }
                     }
 
                 }
                 pictureGroups.add(priPics);
-                priPics=new ArrayList<XWPFPicture>();
+                priPics = new ArrayList<XWPFPicture>();
 //                for(List<XWPFPicture> list:pictureGroups)
 //                {
 //                    for(XWPFPicture picture:list)
@@ -487,25 +489,23 @@ public class AModifyWordImage {
 //                        setAnchorAndInline(run,picture,(long)(desiredWidthCm*360000/pictureAmount));
 //                    }
 //                }
-                for (XWPFRun run : paragraph.getRuns())
-                {
-                    System.out.println(runCount+" run.text()   :"+run.text());
-                    System.out.println("paragraph:"+para+"  run  :"+runCount+" run  有"
-                            +run.getEmbeddedPictures().size()+"张图片");
+                for (XWPFRun run : paragraph.getRuns()) {
+                    System.out.println(runCount + " run.text()   :" + run.text());
+                    System.out.println("paragraph:" + para + "  run  :" + runCount + " run  有"
+                            + run.getEmbeddedPictures().size() + "张图片");
 //                    XWPFRun currenRun=currenPara.createRun();
 //                    currenRun.setText(run.text());
 //                    currenRun=run;
                     runCount++;
-                    pic=1;
+                    pic = 1;
 
                     //run.getEmbeddedPictures().removeAll(priPics);
                     // 获取Run中的所有Embedded Pictures
-                    for (XWPFPicture picture : run.getEmbeddedPictures())
-                    {
+                    for (XWPFPicture picture : run.getEmbeddedPictures()) {
                         // picture.getPictureData()
-                        pictureAmount=1;
+                        pictureAmount = 1;
                         float desiredWidthCm = 14.3f;//厘米
-                        long desiredHeight=0l;//EMU
+                        long desiredHeight = 0l;//EMU
                         //priPics.add(picture);
                         //if( picture.getCTPicture().getSpPr().getXfrm().getExt().getCx()/360000)
 
@@ -525,16 +525,12 @@ public class AModifyWordImage {
 //                        paragraph.getSpacingBetween();
 ////                        paragraph.setSpacingAfterLines(50);
 //                        paragraph.setSpacingBetween(300);
-                        for(List<XWPFPicture> list:pictureGroups)
-                        {
-                            if(list.indexOf(picture)>-1)
-                            {
-                                pictureAmount=list.size();
-                                for(XWPFPicture pp:list)
-                                {
-                                    if (pp.getCTPicture().getSpPr().getXfrm().getExt().getCy()>desiredHeight)
-                                    {
-                                        desiredHeight=pp.getCTPicture().getSpPr().getXfrm().getExt().getCy();
+                        for (List<XWPFPicture> list : pictureGroups) {
+                            if (list.indexOf(picture) > -1) {
+                                pictureAmount = list.size();
+                                for (XWPFPicture pp : list) {
+                                    if (pp.getCTPicture().getSpPr().getXfrm().getExt().getCy() > desiredHeight) {
+                                        desiredHeight = pp.getCTPicture().getSpPr().getXfrm().getExt().getCy();
                                     }
                                 }
                                 break;
@@ -545,9 +541,9 @@ public class AModifyWordImage {
                         paragraph.setIndentationRight(10);
                         paragraph.setFirstLineIndent(0);
                         paragraph.setAlignment(ParagraphAlignment.CENTER);
-                        PoiSetWidth(picture,pic,(long)(desiredWidthCm*360000/pictureAmount),desiredHeight);
-                        System.out.println("changed pic"+pic+"  picture.getCTPicture()  :"+picture.getCTPicture());
-                        setAnchorAndInline(run,picture,(long)(desiredWidthCm*360000/pictureAmount),desiredHeight);
+                        PoiSetWidth(picture, pic, (long) (desiredWidthCm * 360000 / pictureAmount), desiredHeight);
+                        System.out.println("changed pic" + pic + "  picture.getCTPicture()  :" + picture.getCTPicture());
+                        setAnchorAndInline(run, picture, (long) (desiredWidthCm * 360000 / pictureAmount), desiredHeight);
 
                         //插入图片
 //                        InputStream inputStream = new ByteArrayInputStream(decoderBytes);
@@ -568,7 +564,7 @@ public class AModifyWordImage {
                         long RIGHT_MARGIN = 1800L;
                         long TOP_MARGIN = 1440L;
                         long BOTTOM_MARGIN = 1440L;
-                        double hight=  Units.pixelToPoints(picture.getDepth()) * 2.54 / 1440.0 * 20.0;
+                        double hight = Units.pixelToPoints(picture.getDepth()) * 2.54 / 1440.0 * 20.0;
                         // Pictures.ofBytes(bytes).sizeInCm(14.3,hight).create();
                         // Pictures.ofBytes(bytes).sizeInCm(14.3,picture.getDepth());
 //                        // 修改图片的边框
@@ -611,7 +607,20 @@ public class AModifyWordImage {
                 }
                 para++;
             }
-
+        List<XWPFParagraph>  paragraphLists =  document.getParagraphs();
+            for(XWPFParagraph p:paragraphLists)
+            {
+               List<XWPFRun> xwpfRuns= p.getRuns();
+               for(XWPFRun r:xwpfRuns)
+               {
+                 List<CTDrawing> drawingList= r.getCTR().getDrawingList();
+                 for(CTDrawing d:drawingList)
+                 {
+                    List<CTAnchor> anchors= d.getAnchorList();
+                    anchors.removeAll(anchors);
+                 }
+               }
+            }
             // 保存修改后的Word文档
             // FileOutputStream fos = new FileOutputStream("D:/test_word/modified_document.docx");
             //document.write(fos);
@@ -657,10 +666,10 @@ public class AModifyWordImage {
 //            // 关闭资源
 //            delFis.close();
 //            delFos.close();
-        }
-        catch (IOException | XmlException e)
-        {
+        } catch (IOException | XmlException e)
+            {
             e.printStackTrace();
         }
+    }
     }
 }
