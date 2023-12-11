@@ -522,10 +522,12 @@ public class AModifyWordImage {
                 //List<XWPFPicture> pictureList=
                 XWPFDocument document = xwpfTemplate.getXWPFDocument();
                 if(document.getNumbering()==null)document.createNumbering();
-                for (XWPFNum n : modelNumberbing.getNums()) {
+                for (XWPFNum n : modelNumberbing.getNums())
+                {
                     document.getNumbering().addNum(n);
                 }
-                for (XWPFAbstractNum n : modelNumberbing.getAbstractNums()) {
+                for (XWPFAbstractNum n : modelNumberbing.getAbstractNums())
+                {
                     document.getNumbering().addAbstractNum(n);
                 }
 
@@ -543,7 +545,8 @@ public class AModifyWordImage {
                 if (document.getStyles() == null) {
                     document.createStyles();
                 }
-                for (int styleId = 0; styleId < ctArray.length; styleId++) {
+                for (int styleId = 0; styleId < ctArray.length; styleId++)
+                {
 
                     //  XWPFStyles styles=  styleModel.getXWPFDocument().getStyles();
 
@@ -553,9 +556,18 @@ public class AModifyWordImage {
                     {
                         continue;
                     }
-                    // document.getStyle().set(styleModel.getXWPFDocument().getStyle());
-                    document.getStyles().addStyle(style);
-                    try {
+                    //document.getStyle().set(styleModel.getXWPFDocument().getStyle());
+                    if(document.getStyles().getStyle(style.getStyleId())!=null)
+                    {
+                        //document.getStyles().addStyle(style);
+                        document.getStyles().getStyle(style.getStyleId()).setStyle(style.getCTStyle());
+                    }
+                    else
+                    {
+                        document.getStyles().addStyle(style);
+                    }
+                    try
+                    {
                         String le = ctArray[styleId].getPPr().getOutlineLvl().toString();
                         System.out.println(le);
                         if (styleMap.get(le) == null) {
@@ -585,6 +597,10 @@ public class AModifyWordImage {
                 // 获取文档中的所有段落
                 for (XWPFParagraph paragraph : document.getParagraphs())
                 {
+
+                    if(paragraph.getText()!="")
+                        paragraph.setStyle(document.getStyles().getStyle("3").getStyleId());
+
                     String paraType = "";
 //                    if (paragraph.getDocument().getTables().size() > 0) {
 //                        paraType = "table";
