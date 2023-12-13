@@ -75,9 +75,11 @@ public class AnotherCustomXWPFDocument extends XWPFDocument {
 
         //CTGraphicalObjectData graphicData = inline.addNewGraphic().addNewGraphicData();
         XmlToken xmlToken = null;
-        try {
+        try
+        {
             xmlToken = XmlToken.Factory.parse(picXml);
-        } catch(XmlException xe) {
+        } catch(XmlException xe)
+        {
             xe.printStackTrace();
         }
         inline.set(xmlToken);

@@ -32,7 +32,7 @@ public class CustomXWPFDocument extends XWPFDocument
         super(in);
     }
 
-    public void createPicture(XWPFParagraph paragraph,
+    public static void createPicture(XWPFParagraph paragraph,
                               XWPFRun run,
                               XWPFPicture picture,
                               String blipId, int id, long width, long height, long w, String clr,String bid)
@@ -41,7 +41,6 @@ public class CustomXWPFDocument extends XWPFDocument
        // width *= EMU;
         //height *= EMU;
         //String blipId = getAllPictures().get(id).getPackageRelationship().getId();
-
      //  run.getCTR().getDrawingList().remove(picture);
       // CTInline inline =run.getCTR().addNewDrawing().addNewInline();
 //        XWPFParagraph para=  createParagraph();
@@ -147,7 +146,7 @@ public class CustomXWPFDocument extends XWPFDocument
                 "</a:ln>" +
                 "         </pic:spPr>" ;
        CTPicture ctPicture= CTPicture.Factory.parse(picXml);
-      return   new XWPFPicture(ctPicture, run);
+       return   new XWPFPicture(ctPicture, run);
         //CTGraphicalObjectData graphicData = inline.addNewGraphic().addNewGraphicData();
 //        XmlToken xmlToken = null;
 //        try {
