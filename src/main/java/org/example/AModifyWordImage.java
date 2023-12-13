@@ -27,7 +27,8 @@ public class AModifyWordImage {
             if (para.getCTP().getPPr().getOutlineLvl() != null) {
                 return String.valueOf(para.getCTP().getPPr().getOutlineLvl().getVal());
             }
-        } catch (Exception e) {
+        } catch (Exception e)
+        {
         }
         try {
             //判断该段落的样式是否设置了大纲级别
@@ -43,12 +44,13 @@ public class AModifyWordImage {
                 String styleName = doc.getStyles().getStyle(para.getStyle()).getCTStyle().getBasedOn().getVal();
                 return String.valueOf(doc.getStyles().getStyle(styleName).getCTStyle().getPPr().getOutlineLvl().getVal());
             }
-        } catch (Exception e) {
+        } catch (Exception e)
+        {
 
         }
         try {
             if (para.getStyleID() != null) {
-                return para.getStyleID();
+                return "paraStyleId"+para.getStyleID();
             }
         } catch (Exception e) {
 
@@ -468,12 +470,22 @@ public class AModifyWordImage {
                 {
                 if ((lvl != null) && (lvl != "") && (styleHashMap.get(lvl) == null))
                 {
+                    if(lvl.indexOf("paraStyleId")>-1)
+                    {
+                       if(isBeforeTbOrAfterPic(modelTemp.getXWPFDocument(),para))
+                       {
+
+                       }
+                    }
+                    else
+                    {
                     XWPFStyle style = modelTemp.getXWPFDocument().getStyles().
                             getStyle(para.getStyleID());
-                    CTString ctString = CTString.Factory.newInstance();
-                    ctString.setVal(styleNormal.getCTStyle().getStyleId());
+//                    CTString ctString = CTString.Factory.newInstance();
+//                    ctString.setVal(styleNormal.getCTStyle().getStyleId());
                    // style.getCTStyle().setBasedOn(ctString);
                     styleHashMap.put(lvl, style);
+                    }
                 }
             }
 
@@ -485,6 +497,39 @@ public class AModifyWordImage {
 //        style.setStyleId("model"+style.getStyleId());
 //    }
     }
+
+    private static boolean isBeforeTbOrAfterPic(XWPFDocument document, XWPFParagraph para)
+    {
+        IBodyElement preAndAfter;
+        boolean rslt=false;
+        for (IBodyElement ele : document.getBodyElements()) {
+            if (ele.getElementType().equals(BodyElementType.valueOf("PARAGRAPH")))
+            {
+
+                if(para.getRuns().size()<1) rslt=true;
+
+                if (para.getRuns().get(0).getEmbeddedPictures().size() > 0)
+                {
+
+
+
+
+                }
+                else
+                {
+
+                }
+            } else if (ele.getElementType().equals(BodyElementType.valueOf("TABLE"))) {
+
+
+            }
+
+        }
+
+         return rslt;
+
+    }
+
     public static void copyFileToModel(XWPFTemplate model,XWPFTemplate pri) throws InvalidFormatException, XmlException, IOException {
 
 
