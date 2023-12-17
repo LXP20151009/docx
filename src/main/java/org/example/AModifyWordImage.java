@@ -1,6 +1,7 @@
 package org.example;
 
 import com.deepoove.poi.XWPFTemplate;
+import com.deepoove.poi.data.Pictures;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.util.ZipSecureFile;
@@ -10,12 +11,10 @@ import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlToken;
 import org.openxmlformats.schemas.drawingml.x2006.wordprocessingDrawing.CTAnchor;
 import org.openxmlformats.schemas.drawingml.x2006.wordprocessingDrawing.CTInline;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTDrawing;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTString;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTStyle;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTStyles;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
 
 import java.io.*;
+import java.math.BigInteger;
 import java.util.*;
 
 public class AModifyWordImage {
@@ -551,13 +550,51 @@ public class AModifyWordImage {
         int x = 1;
         // HashMap<String,XWPFStyle>
         HashMap<String, XWPFStyle> styleHashMap = new HashMap<>();
+        for(CTStyle ctStyle:model.getXWPFDocument().getStyle().getStyleList())
+        {
+            //模板样式名称中要有 模板二字
+            if(ctStyle.getName().getVal().indexOf("模板")>-1)
+            {
+                // pri.getXWPFDocument().getStyles().getStyle(ctStyle.getStyleId()).getCTStyle().getPPr().getOutlineLvl()
+              //正文 和 基于正文的样式，无大纲级别
+               if(ctStyle.getPPr()==null||ctStyle.getPPr().getOutlineLvl()==null)
+               {
+                   if(ctStyle.getName().getVal().toLowerCase().equals("normal"))
+                   {
+                       styleHashMap.put("Noraml",model.getXWPFDocument().getStyles().getStyle(ctStyle.getStyleId()));
+                   }
+                   else
+                   {
+                       if(ctStyle.getPPr().getJc().getVal()== STJc.CENTER&&ctStyle.getName().getVal().indexOf("图表")>-1&&
+                               ctStyle.getBasedOn().getVal().toLowerCase().equals
+                                       (model.getXWPFDocument().getStyles().
+                                               getStyleWithName("Normal").getStyleId()))
+                       {
+                           if(ctStyle.getName().getVal().indexOf("图表标题")>-1)
+                            styleHashMap.put("图表标题",model.getXWPFDocument().getStyles().getStyle(ctStyle.getStyleId()));
+                           if(ctStyle.getName().getVal().indexOf("图表样式")>-1)
+                               styleHashMap.put("图表样式",model.getXWPFDocument().getStyles().getStyle(ctStyle.getStyleId()));
+                       }
+                   }
+               }
+                BigInteger lvl = ctStyle.getPPr().getOutlineLvl().getVal();
+                if (styleHashMap.get(lvl.toString()) == null)
+                {
+                    styleHashMap.put(lvl.toString(),
+                            model.getXWPFDocument().getStyles().getStyle(ctStyle.getStyleId()));
+                }
+            }
+
+        }
         x = pri.getXWPFDocument().getParagraphs().size();
         int size = model.getXWPFDocument().getBodyElements().size();
-        for (int ele = 0; ele < size; ele++) {
+        for (int ele = 0; ele < size; ele++)
+        {
             model.getXWPFDocument().removeBodyElement(size - 1 - ele);
 
         }
-        for (IBodyElement ele : pri.getXWPFDocument().getBodyElements()) {
+        for (IBodyElement ele : pri.getXWPFDocument().getBodyElements())
+        {
             if (ele.getElementType().equals(BodyElementType.valueOf("PARAGRAPH")))
             {
                 XWPFParagraph para = (XWPFParagraph) ele;
@@ -601,26 +638,25 @@ public class AModifyWordImage {
                             ctInline.getEffectExtent().setT("10000");
                             ctInline.getEffectExtent().setL("10000");
                             ctInline.getEffectExtent().setR("10000");
-
                         }
-
-
                     }
-                    modelPara.setStyle(modelPara.getDocument().getStyles().getStyleWithName("7TB7").getStyleId());
+                    modelPara.setStyle(modelPara.getDocument().getStyles().getStyleWithName("图表样式").getStyleId());
                 }
                 else
-                    {
+                {
                         int pos = model.getXWPFDocument().getParagraphs().size() - 1;
                         model.getXWPFDocument().setParagraph(para, pos);
-                        modelPara.setStyle(modelPara.getDocument().getStyles().getStyleWithName("3BT3").getStyleId());
-                    }
-            } else if (ele.getElementType().equals(BodyElementType.valueOf("TABLE"))) {
+                        String lvl= getTitleLvl(pri.getXWPFDocument(),para);
+                        modelPara.setStyle(styleHashMap.get(lvl).getStyleId());
+                }
+            }
+            else if(ele.getElementType().equals(BodyElementType.valueOf("TABLE")))
+            {
                 XWPFTable table = (XWPFTable) ele;
                 XWPFTable modelTb = model.getXWPFDocument().createTable();
                 int pos = model.getXWPFDocument().getTables().size() - 1;
                 model.getXWPFDocument().setTable(pos, table);
-                modelTb.setStyleID("3BT3");
-
+                modelTb.setStyleID(styleHashMap.get("图表样式").getStyleId());
             }
             System.out.println(ele + " ele.toString():    :" + ele.toString());
             System.out.println(ele + " ele  getElementType:" + ele.getElementType());
@@ -628,7 +664,6 @@ public class AModifyWordImage {
             System.out.println(ele + " ele.getBody   :" + ele.getBody().getParagraphs().size());
             System.out.println(ele + " ele.getPart   :" + ele.getPart());
             System.out.println(ele + " ele.getPartType   :" + ele.getPartType());
-
         }
         System.out.println("paraCount " + pri.getXWPFDocument().getParagraphs().size());
         System.out.println("eleCount " + pri.getXWPFDocument().getBodyElements().size());
@@ -675,7 +710,6 @@ public class AModifyWordImage {
             {
                 continue;
             }
-
             if(!srcFile.getName().equals("test.docx"))
                 continue;
 
@@ -687,13 +721,10 @@ public class AModifyWordImage {
                 XWPFTemplate xwpfTemplate = XWPFTemplate.compile(srcFile);
                 //List<XWPFPicture> pictureList=
                 XWPFDocument document = xwpfTemplate.getXWPFDocument();
-
-
                 //添加模板中的样式
                 CTStyles ctStyles = styleModel.getXWPFDocument().getStyle();
                 CTStyle[] ctArray = ctStyles.getStyleArray();
                 //document.getStyles().addStyle(styleHashMap.get("Normal"));
-
                 Map<String, String> styleMap = new HashMap<>();
                 if (document.getStyles() == null)
                 {
@@ -1058,27 +1089,9 @@ public class AModifyWordImage {
             try {
                 FileInputStream fis = new FileInputStream(srcFile);
                 FileOutputStream fos = new FileOutputStream(desFile + srcFile.getName());
-                // CustomXWPFDocument document = new CustomXWPFDocument(fis);
-                //HWPFDocument document =new HWPFDocument(fis);
                 XWPFTemplate xwpfTemplate = XWPFTemplate.compile(srcFile);
                 //List<XWPFPicture> pictureList=
                 XWPFDocument document = xwpfTemplate.getXWPFDocument();
-
-//                if(document.getNumbering()==null)document.createNumbering();
-//                for (XWPFNum n : modelNumberbing.getNums())
-//                {
-//                    document.getNumbering().addNum(n);
-//                }
-//                for (XWPFAbstractNum n : modelNumberbing.getAbstractNums())
-//                {
-//                    document.getNumbering().addAbstractNum(n);
-//                }
-
-//             for (XWPFStyle style: styleModel.getXWPFDocument().getStyles().getUsedStyleList
-//                     (styleModel.getXWPFDocument().getStyles().getStyleWithName("Normal")))
-//             {
-//                 document.getStyles().addStyle(style);
-//             }
                 //添加模板中的样式
                 CTStyles ctStyles = styleModel.getXWPFDocument().getStyle();
                 CTStyle[] ctArray = ctStyles.getStyleArray();
@@ -1089,88 +1102,14 @@ public class AModifyWordImage {
                 {
                     document.createStyles();
                 }
-//                for (int styleId = 0; styleId < ctArray.length; styleId++)
-//                {
-//
-//                    //  XWPFStyles styles=  styleModel.getXWPFDocument().getStyles();
-//
-//                    XWPFStyle style = styleModel.getXWPFDocument().
-//                            getStyles().getStyle(ctArray[styleId].getStyleId());
-//                    if (style == null)
-//                    {
-//                        continue;
-//                    }
-//                    //document.getStyle().set(styleModel.getXWPFDocument().getStyle());
-//                    if(document.getStyles().getStyle(style.getStyleId())!=null)
-//                    {
-//                        //document.getStyles().addStyle(style);
-//                        document.getStyles().getStyle(style.getStyleId()).setStyle(style.getCTStyle());
-//                    }
-//                    else
-//                    {
-//                        document.getStyles().addStyle(style);
-//                    }
-//                    try
-//                    {
-//                        String le = ctArray[styleId].getPPr().getOutlineLvl().toString();
-//                        System.out.println(le);
-//                        if (styleMap.get(le) == null) {
-//                            styleMap.put(le, ctArray[styleId].getStyleId() + ",," + ctArray[styleId].getName());
-//                        }
-//                    } catch (Exception e) {
-//                        styleMap.put("text", ctArray[styleId].getStyleId() + ",," + ctArray[styleId].getName());
-//                    }
-//                }
 
-                //xwpfTemplate.render();
-//            for(int i=0;i< pictureList.size();i++)
-//            {
-//                pictureList.get(i)
-//            }
                 int para = 1;
                 int runCount = 1;
                 int pic = 1;
                 List<XWPFPicture> priPics = new ArrayList<XWPFPicture>();
-//                for(IBodyElement iBodyElement:document.getBodyElements())
-//                {
-//                   String string= iBodyElement.getElementType().name();
-//                   System.out.println("iBodyElement.getElementType().name()= "+string);
-//                   string = iBodyElement.getPartType().name();
-//                    System.out.println("iBodyElement.getPartType().name()= "+string);
-//                }
                 // 获取文档中的所有段落
                 for (XWPFParagraph paragraph : document.getParagraphs())
                 {
-
-//                    if(paragraph.getText()!="")
-//                        paragraph.setStyle(document.getStyles().getStyle("3").getStyleId());
-
-                    String paraType = "";
-//                    if (paragraph.getDocument().getTables().size() > 0) {
-//                        paraType = "table";
-//                        if (document.getStyles().getStyle(styleHashMap.get("table").getStyleId()) != null) {
-//                            document.getStyles().addStyle(styleHashMap.get("table"));
-//                        }
-//                        paragraph.setStyle(styleHashMap.get("table").getStyleId());
-//                    } else if (paragraph.getDocument().getAllPictures().size() > 0) {
-//                        paraType = "picture";
-//                        if (document.getStyles().getStyle(styleHashMap.get("picture").getStyleId()) != null) {
-//                            document.getStyles().addStyle(styleHashMap.get("picture"));
-//                        }
-//                        paragraph.setStyle(styleHashMap.get("picture").getStyleId());
-//                    } else if (paragraph.getText().length() > 0) {
-//                        String lvl = getTitleLvl(document, paragraph);
-//                        if (lvl != null && lvl != "") {
-//                            if (document.getStyles().getStyle(styleHashMap.get(lvl).getStyleId()) != null) {
-//                                document.getStyles().addStyle(styleHashMap.get(lvl));
-//                            }
-//                            paragraph.setStyle(styleHashMap.get(lvl).getStyleId());
-//                        } else
-//                            paragraph.setStyle(styleHashMap.get("Normal").getStyleId());
-//
-//
-//                    }
-
 
                     String eleType = String.valueOf(paragraph.getElementType());
                     String tempLevel = getTitleLvl(document, paragraph);
@@ -1206,23 +1145,10 @@ public class AModifyWordImage {
                     }
                     pictureGroups.add(priPics);
                     priPics = new ArrayList<XWPFPicture>();
-//                for(List<XWPFPicture> list:pictureGroups)
-//                {
-//                    for(XWPFPicture picture:list)
-//                    {
-//                        float desiredWidthCm = 14.3f;//厘米
-//                        PoiSetWidth(picture,pic,(long)(desiredWidthCm*360000/pictureAmount));
-//                        System.out.println("changed pic"+pic+"  picture.getCTPicture()  :"+picture.getCTPicture());
-//                        setAnchorAndInline(run,picture,(long)(desiredWidthCm*360000/pictureAmount));
-//                    }
-//                }
                     for (XWPFRun run : paragraph.getRuns()) {
                         System.out.println(runCount + " run.text()   :" + run.text());
                         System.out.println("paragraph:" + para + "  run  :" + runCount + " run  有"
                                 + run.getEmbeddedPictures().size() + "张图片");
-//                    XWPFRun currenRun=currenPara.createRun();
-//                    currenRun.setText(run.text());
-//                    currenRun=run;
                         runCount++;
                         pic = 1;
 
@@ -1266,7 +1192,7 @@ public class AModifyWordImage {
                             long TOP_MARGIN = 1440L;
                             long BOTTOM_MARGIN = 1440L;
                             double hight = Units.pixelToPoints(picture.getDepth()) * 2.54 / 1440.0 * 20.0;
-                            // Pictures.ofBytes(bytes).sizeInCm(14.3,hight).create();
+                            // Pictures.ofBytes(new byte[3]).sizeInCm(14.3,hight).create();
                             // Pictures.ofBytes(bytes).sizeInCm(14.3,picture.getDepth());
 //                        // 修改图片的边框
                             // if(!picture.getCTPicture().getSpPr().isSetSolidFill())
